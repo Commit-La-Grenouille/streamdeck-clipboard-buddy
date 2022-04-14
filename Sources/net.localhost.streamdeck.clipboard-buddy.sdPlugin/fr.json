@@ -1,0 +1,8 @@
+{
+  "Description": "Conservez et réutilisez du texte venu de votre presse-papier.", 
+  "Name": "Post-it Presse-Papier", 
+  "net.localhost.streamdeck.clipboard-buddy.action": {
+    "Name": "Boutton Presse-Papier", 
+    "Tooltip": "Conservez et réutilisez du texte venu de votre presse-papier"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "Actions": [
+    {
+      "Icon": "postit-action",
+      "Name": "Clipboard slot",
+      "States": [
+        {
+          "Image": "postit-unused",
+          "TitleAlignment": "middle",
+          "FontSize": "12",
+          "TitleColor": "cyan"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "",
+      "UUID": "net.localhost.streamdeck.clipboard-buddy"
+    }
+  ],
+  "SDKVersion": 2,
+  "Author": "Commit-La-Grenouille",
+  "CodePath": "Clipboard-Buddy",
+  "Name": "Clipboard Buddy",
+  "Description": "Your best friend with clipboard text retention needs",
+  "Icon": "postit-store",
+  "Version": "0.1.0",
+  "Category": "Clipboard Buddy",
+  "CategoryIcon": "postit-category",
+  "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "10.12"
+    }
+  ],
+  "Software": {
+    "MinimumVersion": "4.1"
+  }
+}

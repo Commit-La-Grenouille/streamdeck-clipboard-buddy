@@ -1,0 +1,8 @@
+{
+  "Description": "Set aside and re-use text from your clipboard.", 
+  "Name": "Clipboard Buddy", 
+  "net.localhost.streamdeck.clipboard-buddy.action": {
+    "Name": "Clipboard slot", 
+    "Tooltip": "Set aside and re-use text from your clipboard"
+  }
+}

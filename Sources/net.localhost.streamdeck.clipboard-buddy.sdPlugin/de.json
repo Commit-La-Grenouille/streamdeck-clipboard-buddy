@@ -1,0 +1,8 @@
+{
+  "Description": "Text für später aufbewahren.", 
+  "Name": "Zwischenablage Freund", 
+  "net.localhost.streamdeck.clipboard-buddy.action": {
+    "Name": "Zwischenablage Taste", 
+    "Tooltip": "Text für später aufbewahren"
+  }
+}

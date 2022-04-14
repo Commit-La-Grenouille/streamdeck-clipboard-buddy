@@ -1,0 +1,15 @@
+# Build-related files
+**/build/**
+**/xcuserdata/**
+
+# The Elgato DistributionTool binary
+**/DistributionToolMac.zip
+**/DistributionTool
+
+# Binaries we do not want in Git (more in the release section)
+net.localhost.streamdeck.clipboard-buddy.streamDeckPlugin
+Sources/net.localhost.streamdeck.clipboard-buddy.sdPlugin/Clipboard-Buddy
+
+# Mac-related noise
+**/.DS_Store
+

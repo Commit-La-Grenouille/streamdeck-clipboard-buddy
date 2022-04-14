@@ -1,0 +1,8 @@
+{
+  "Description": "Guardar texto para más tarde.", 
+  "Name": "Portapapeles Amigo", 
+  "net.localhost.streamdeck.clipboard-buddy.action": {
+    "Name": "Portapapeles botón", 
+    "Tooltip": "Guardar texto para más tarde"
+  }
+}
