@@ -1,5 +1,7 @@
 # streamdeck-clipboard-buddy
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FCommit-La-Grenouille%2Fstreamdeck-clipboard-buddy.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FCommit-La-Grenouille%2Fstreamdeck-clipboard-buddy?ref=badge_shield)
+
 - [streamdeck-clipboard-buddy](#streamdeck-clipboard-buddy)
   - [About](#about)
     - [Left To Do (not comprehensive)](#left-to-do-not-comprehensive)
@@ -77,4 +79,6 @@ For the releasing, you can use the **package_for_release.sh** script that will d
 
 ## License
 This code is available under the GPLv3 license (see the COPYING or LICENSE file).
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FCommit-La-Grenouille%2Fstreamdeck-clipboard-buddy.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FCommit-La-Grenouille%2Fstreamdeck-clipboard-buddy?ref=badge_large)
 
