@@ -2,11 +2,10 @@
 /**
 @file       MyStreamDeckPlugin.h
 
-@brief      A Stream Deck plugin displaying the number of unread emails in Apple's Mail
+@brief      A Stream Deck plugin to provide a way to retain some clipboard data for re-use
 
 @copyright  (c) 2018, Corsair Memory, Inc.
 			This source code is licensed under the MIT-style license found in the LICENSE file.
-
 **/
 //==============================================================================
 

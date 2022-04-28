@@ -5,8 +5,9 @@
 @brief      A Stream Deck plugin to provide a way to retain some clipboard data for re-use
 
 @copyright  (c) 2022, Commit-La-Grenouille
-			This source code is licensed under the GPLv3-style license found in the LICENSE file.
+            This source code is licensed under the GPLv3-style license found in the LICENSE file.
 
+            Copyright © 2018 Elgato Systems/Corsair Memory Inc.. All rights reserved.
 **/
 //==============================================================================
 
@@ -230,21 +231,14 @@ static NSString * askUserForLabel() {
     //
     // TODO: replace with objective-c code if it is less than Apollo-11 codebase ;o))
     //
-    NSURL* url = [NSURL fileURLWithPath:GetResourcePath(@"secureLabelDialog.scpt")];
-
-    NSDictionary *errors = nil;
-    NSAppleScript* appleScript = [[NSAppleScript alloc] initWithContentsOfURL:url error:&errors];
-    if(appleScript != nil) {
-        NSAppleEventDescriptor *eventDescriptor = [appleScript executeAndReturnError:&errors];
-        //
-        // The applescript should return: {button returned:"OK", text returned:"tralala"}
-        //
-        if(eventDescriptor != nil && [eventDescriptor descriptorType] != kAENullEvent) {
-            return [eventDescriptor stringValue];
-        }
-    }
+    
+    NSWindowController *labelWindow = [[NSWindowController alloc] initWithWindowNibName:@"SecureLabelWindow"];
+    [labelWindow showWindow:nil];
+    
     return @"???"; // So at least we know there is some data stored there even if we got no label
 }
+
+
 
 
 // MARK: - MyStreamDeckPlugin

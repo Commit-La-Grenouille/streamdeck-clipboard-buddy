@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		86153A0F281A9E9000E90EEF /* SecureLabelWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 86153A0E281A9E9000E90EEF /* SecureLabelWindowController.m */; };
 		FA29E473215E7D2300C9F60C /* ESDConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FA29E46E215E7D2300C9F60C /* ESDConnectionManager.m */; };
 		FA29E474215E7D2300C9F60C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FA29E46F215E7D2300C9F60C /* main.m */; };
 		FA80591421623A0D00ED7E12 /* ESDUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = FA80591321623A0D00ED7E12 /* ESDUtilities.m */; };
@@ -47,6 +48,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		86153A0D281A9E7200E90EEF /* SecureLabelWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SecureLabelWindowController.h; sourceTree = "<group>"; };
+		86153A0E281A9E9000E90EEF /* SecureLabelWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecureLabelWindowController.m; sourceTree = "<group>"; };
+		86498C32281A873E000771BA /* SecureLabelWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SecureLabelWindow.xib; sourceTree = "<group>"; };
 		FA0F7B772105CBC30028CF34 /* Clipboard-Buddy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Clipboard-Buddy"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA29E46E215E7D2300C9F60C /* ESDConnectionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ESDConnectionManager.m; sourceTree = "<group>"; };
 		FA29E46F215E7D2300C9F60C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -119,6 +123,9 @@
 		FA0F7B6E2105CBC30028CF34 = {
 			isa = PBXGroup;
 			children = (
+				86153A0E281A9E9000E90EEF /* SecureLabelWindowController.m */,
+				86153A0D281A9E7200E90EEF /* SecureLabelWindowController.h */,
+				86498C32281A873E000771BA /* SecureLabelWindow.xib */,
 				FACCC866211AC281008C87BD /* MyStreamDeckPlugin.h */,
 				FACCC865211AC281008C87BD /* MyStreamDeckPlugin.m */,
 				FA29E46D215E7D2300C9F60C /* Common */,
@@ -349,6 +356,7 @@
 				FA80591421623A0D00ED7E12 /* ESDUtilities.m in Sources */,
 				FAC7C8292122CE1D000262E7 /* SRWebSocket.m in Sources */,
 				FAC7C8232122CE1D000262E7 /* SRRandom.m in Sources */,
+				86153A0F281A9E9000E90EEF /* SecureLabelWindowController.m in Sources */,
 				FAC7C81D2122CE1D000262E7 /* SRConstants.m in Sources */,
 				FAC7C81A2122CE1D000262E7 /* SRProxyConnect.m in Sources */,
 				FAC7C81C2122CE1D000262E7 /* SRPinningSecurityPolicy.m in Sources */,
