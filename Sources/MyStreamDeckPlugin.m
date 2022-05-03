@@ -90,7 +90,7 @@ static CGContextRef CreateBitmapContext(CGSize inSize)
 //
 // Utility method that takes the path of an image and a string and returns the bitmap result
 //
-static CGImageRef ComposeImage(NSString *inImagePath, NSString *overlayText)
+static CGImageRef ComposeImage(NSString *inImagePath, NSString *overlayText, NSColor *textColor)
 {
     CGImageRef completeImage = nil;
     
@@ -119,10 +119,13 @@ static CGImageRef ComposeImage(NSString *inImagePath, NSString *overlayText)
                     // Choosing a monospaced font installed by default in macOS that deals well with small sizes
                     CTFontRef font = CTFontCreateWithName(CFSTR("Andale Mono"), fontSize, nil);
                     
+                    // Making sure that we have a text color otherwise we default to yellow
+                    if(textColor == nil) { textColor = NSColor.systemYellowColor; }
+ 
                     // Do not forget that the attributes are fed backward (VALUE OBJ, KEY)
                     NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                                 (__bridge id)font, kCTFontAttributeName,
-                                                NSColor.systemYellowColor, NSForegroundColorAttributeName,
+                                                textColor, NSForegroundColorAttributeName,
                                                     nil];
                     CFRelease(font);
 
@@ -251,12 +254,6 @@ static NSString * askUserForLabel() {
 
 @interface MyStreamDeckPlugin ()
 
-// A timer fired each minute to update the number of unread email from Apple's Mail
-//@property (strong) NSTimer *refreshTimer;
-
-// The list of visible contexts
-//@property (strong) NSMutableArray *knownContexts;
-
 // The empty post-it icon encoded in base64
 @property (strong) NSString *base64PostitEmpty;
 @property (strong) NSString *base64PostitSecure;
@@ -272,6 +269,10 @@ static NSString * askUserForLabel() {
 @property (strong) NSDate *keyPressed;
 @property (strong) NSDate *keyReleased;
 
+// The system colors to diversify the text color on keys
+@property (strong) NSArray *textColorMatrix;
+@property (strong) NSColor *previousColor;
+
 @end
 
 
@@ -284,10 +285,34 @@ static NSString * askUserForLabel() {
 - (void)setupIfNeeded
 {
 	if (_base64PostitEmpty == nil) {
-		_base64PostitEmpty = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"postit-empty@2x.png"), @""));
+		_base64PostitEmpty = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"postit-empty@2x.png"), @"", nil));
 	}
     if (_base64PostitSecure == nil) {
-        _base64PostitSecure = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"postit-secure@2x.png"), @""));
+        _base64PostitSecure = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"postit-secure@2x.png"), @"", nil));
+    }
+
+    // Preparing the matrix to diversify the color of key's text (almost enough for the 15 buttons)
+    /*
+     * Joy of OS X versions variations:
+     *    => we are forced to use cyanColor as systemCyanColor required 12.0 or newer
+     *    => we cannot use systemIndigoColor because it requires 10.15 or newer
+     */
+    if (_textColorMatrix == nil) {
+        _textColorMatrix = @[
+            NSColor.systemBlueColor,
+            NSColor.systemBrownColor,
+            NSColor.cyanColor,
+            NSColor.systemGreenColor,
+            NSColor.lightGrayColor,
+            NSColor.magentaColor,
+            NSColor.systemMintColor,
+            NSColor.systemOrangeColor,
+            NSColor.systemPinkColor,
+            NSColor.systemPurpleColor,
+            NSColor.systemRedColor,
+            NSColor.systemTealColor,
+            NSColor.systemYellowColor,
+        ]; // note: alpha sorted on the color name ;)
     }
 
     // Defining we want to use the central clipboard
@@ -318,9 +343,17 @@ static NSString * askUserForLabel() {
         // Grabbing the current data in the clipboard
         NSString * clipboardContent = [_pboard stringForType:NSStringPboardType];
 
+        // Making sure we store the clipboard data into a separate entry specific to our button
         NSString * dictKey = keyFromCoord(payload[@"coordinates"]);
-
         _tileText[dictKey] = clipboardContent;
+        
+        // Picking also a pseudo-random color for the text we will display on the button
+        NSColor *thisColor = _textColorMatrix[ arc4random_uniform(sizeof(_textColorMatrix)) ];
+        while (thisColor == _previousColor) {
+            thisColor = _textColorMatrix[ arc4random_uniform(sizeof(_textColorMatrix)) ];
+        }
+        _previousColor = thisColor;  // making sure we won't pick the same color next time (crude)
+        
 
         // Showing the copy worked
         [_connectionManager showOKForContext:context];
@@ -336,7 +369,7 @@ static NSString * askUserForLabel() {
         }
         else {
             // Defining everything as image (background + text)
-            NSString *backgroundWithText64 = CreateBase64EncodedString(ComposeImage(@"postit-empty@2x.png", _tileText[ keyFromCoord(payload[@"coordinates"]) ]));
+            NSString *backgroundWithText64 = CreateBase64EncodedString(ComposeImage(@"postit-empty@2x.png", _tileText[ keyFromCoord(payload[@"coordinates"]) ], thisColor));
             [_connectionManager setImage:backgroundWithText64 withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
             
             // THE FOLLOWING WOULD HAVE BEEN A LOT SIMPLER IF ONLY THE SDK SUPPORTED TITLE WRAPPING...
