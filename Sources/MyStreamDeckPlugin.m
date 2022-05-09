@@ -229,24 +229,14 @@ static NSString * keyFromCoord(NSDictionary * esdData) {
 //
 // Having a window dialog to grab a proper label to display with secure clipboard data
 //
-static NSString * askUserForLabel() {
+static NSString * askUserForLabel(NSDateFormatter *df) {
     //
-    // TODO: replace with objective-c code if it is less than Apollo-11 codebase ;o))
+    // TODO: replace with code that prompt the user for an identification string to display
     //
-    NSURL* url = [NSURL fileURLWithPath:GetResourcePath(@"secureLabelDialog.scpt")];
-
-    NSDictionary *errors = nil;
-    NSAppleScript* appleScript = [[NSAppleScript alloc] initWithContentsOfURL:url error:&errors];
-    if(appleScript != nil) {
-        NSAppleEventDescriptor *eventDescriptor = [appleScript executeAndReturnError:&errors];
-        //
-        // The applescript should return: {button returned:"OK", text returned:"tralala"}
-        //
-        if(eventDescriptor != nil && [eventDescriptor descriptorType] != kAENullEvent) {
-            return [eventDescriptor stringValue];
-        }
-    }
-    return @"???"; // So at least we know there is some data stored there even if we got no label
+    
+    // In the meantime, we will make sure we display a safe-and-unique label
+    NSDate *current = [[NSDate alloc] init];
+    return [df stringFromDate:current];
 }
 
 
@@ -272,6 +262,9 @@ static NSString * askUserForLabel() {
 // The system colors to diversify the text color on keys
 @property (strong) NSArray *textColorMatrix;
 @property (strong) NSColor *previousColor;
+
+// For secure entries we store objects to reuse
+@property (strong) NSDateFormatter *daFo;
 
 @end
 
@@ -317,6 +310,10 @@ static NSString * askUserForLabel() {
 
     // Defining we want to use the central clipboard
     _pboard = [NSPasteboard generalPasteboard];
+    
+    // Preparing the date formatter once and for all
+    _daFo = [[NSDateFormatter alloc] init];
+    [_daFo setDateFormat:@"dd.MM.YY\nHH:mm:ss"];
 }
 
 
@@ -363,7 +360,7 @@ static NSString * askUserForLabel() {
             [_connectionManager setImage:_base64PostitSecure withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
             
             // Adding a safe title to avoid leaking sensitive data
-            NSString * secureTitle = askUserForLabel();
+            NSString * secureTitle = askUserForLabel(_daFo);
             [_connectionManager logMessage:[NSString stringWithFormat:@"We asked the user and got the label (%@)", secureTitle]];
             [_connectionManager setTitle:secureTitle withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
         }
