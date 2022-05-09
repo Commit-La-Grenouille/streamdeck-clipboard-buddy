@@ -18,8 +18,8 @@
 #import <AppKit/AppKit.h>
 
 
-#define MIN_LONG_PRESS    1.0
-#define SECURE_PRESS    3.0
+#define MIN_LONG_PRESS    0.5
+#define SECURE_PRESS    1.0
 
 // Size of the images
 #define IMAGE_SIZE    144
