@@ -365,8 +365,12 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
             [_connectionManager setTitle:secureTitle withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
         }
         else {
+            // In case the button was used for a secure entry before, we must make sure we clear the title
+            [_connectionManager setTitle:@"" withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+            
             // Defining everything as image (background + text)
             NSString *backgroundWithText64 = CreateBase64EncodedString(ComposeImage(@"postit-empty@2x.png", _tileText[ keyFromCoord(payload[@"coordinates"]) ], thisColor));
+            
             [_connectionManager setImage:backgroundWithText64 withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
             
             // THE FOLLOWING WOULD HAVE BEEN A LOT SIMPLER IF ONLY THE SDK SUPPORTED TITLE WRAPPING...
