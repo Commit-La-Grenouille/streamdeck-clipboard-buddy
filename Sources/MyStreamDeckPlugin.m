@@ -134,7 +134,7 @@ static CGImageRef ComposeImage(NSString *inImagePath, NSString *overlayText, NSC
                     CGFloat strLenRemain = overlayText.length;
                     CGFloat offset_y = 0.0;
                     
-                    while (strLenRemain >= LINE_LENGTH) {
+                    while (strLenRemain > 0) {
                         //
                         // PART 2: slicing the text into pieces that could fit our constraints
                         //
