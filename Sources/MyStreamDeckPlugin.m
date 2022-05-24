@@ -365,21 +365,36 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
             [_connectionManager setTitle:secureTitle withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
         }
         else {
-            // In case the button was used for a secure entry before, we must make sure we clear the title
-            [_connectionManager setTitle:@"" withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+            NSString * textToDisplay = _tileText[ keyFromCoord(payload[@"coordinates"]) ];
             
-            // Defining everything as image (background + text)
-            NSString *backgroundWithText64 = CreateBase64EncodedString(ComposeImage(@"postit-empty@2x.png", _tileText[ keyFromCoord(payload[@"coordinates"]) ], thisColor));
-            
-            [_connectionManager setImage:backgroundWithText64 withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
-            
-            // THE FOLLOWING WOULD HAVE BEEN A LOT SIMPLER IF ONLY THE SDK SUPPORTED TITLE WRAPPING...
-            
-            // Changing the background for something simpler to display text over
-            //[_connectionManager setImage:_base64PostitEmpty withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
-            
-            // Adding the text to the tile
-            //[_connectionManager setTitle:_tileText[ keyFromCoord(payload[@"coordinates"]) ] withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+            if (textToDisplay.length <= LINE_LENGTH) {
+                // In this situation, we could render the text but it will look very small and the space mostly
+                //    empty, so it is safer to display it as a title (with the title text being set small enough)
+                [_connectionManager setImage:_base64PostitEmpty withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+                
+                [_connectionManager setTitle:textToDisplay withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+                // When the SDK will allow, we should also set this as centered in the display and with
+                //    a font size between 8 and 10...
+                
+            }
+            else {
+                // In case the button was used for a secure entry before, we must make sure we clear the title
+                [_connectionManager setTitle:@"" withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+                
+                // Defining everything as image (background + text)
+                NSString *backgroundWithText64 = CreateBase64EncodedString(
+                                                                           ComposeImage(@"postit-empty@2x.png", textToDisplay, thisColor));
+                
+                [_connectionManager setImage:backgroundWithText64 withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+                
+                // THE FOLLOWING WOULD HAVE BEEN A LOT SIMPLER IF ONLY THE SDK SUPPORTED TITLE WRAPPING...
+                
+                // Changing the background for something simpler to display text over
+                //[_connectionManager setImage:_base64PostitEmpty withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+                
+                // Adding the text to the tile
+                //[_connectionManager setTitle:_tileText[ keyFromCoord(payload[@"coordinates"]) ] withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+            }
         }
     }
     else {
