@@ -246,6 +246,7 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
 
 // The empty post-it icon encoded in base64
 @property (strong) NSString *base64PostitEmpty;
+@property (strong) NSString *base64PostitSleepy;
 @property (strong) NSString *base64PostitSecure;
 
 // The text we want to hold (one entry per key)
@@ -277,6 +278,9 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
 
 - (void)setupIfNeeded
 {
+    if (_base64PostitSleepy == nil) {
+        _base64PostitSleepy = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"postit-unused@2x.png"), @"", nil));
+    }
 	if (_base64PostitEmpty == nil) {
 		_base64PostitEmpty = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"postit-empty@2x.png"), @"", nil));
 	}
@@ -432,7 +436,7 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
 {
 	// Set up the instance variables if needed
 	[self setupIfNeeded];
-	
+
 	// Add the context to the list of known contexts
 	//[self.knownContexts addObject:context];
 }
@@ -449,24 +453,31 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
     NSInteger devWidth = [deviceInfo[@"size"][@"rows"] integerValue];
     NSInteger devHeight= [deviceInfo[@"size"][@"columns"] integerValue];
     
-    // Preparing our dictionary objects (as we need the device's buttons info)
-    _tileText = [[NSMutableDictionary alloc] initWithCapacity: devWidth*devHeight];
-    NSMutableDictionary * tmpDict = [[NSMutableDictionary alloc] initWithCapacity:1];
-    
-	// We need to initialize the dict for text (max the whole size of the device)
-    for (NSInteger row=0; row < devWidth; row++) {
-        for (NSInteger col=0; col < devHeight; col++) {
-            //
-            // We need to fake the usual structure we get while running to use the common keyFromCoord() method
-            // Unfortunately, a dict requires String or string-like elements so we have to do a formatting :(
-            //
-            tmpDict[@"row"] = [NSString stringWithFormat:@"%ld", row];
-            tmpDict[@"column"] = [NSString stringWithFormat:@"%ld", col];
-            _tileText[ keyFromCoord(tmpDict) ] = keyFromCoord(tmpDict);
-            // using the key as default value should make any code misbehavior visible
-        }
+    // Making sure we do not loose data if the computer is locked or goes to sleep ;)
+    if( _dictInitialized ) {
+        [_connectionManager logMessage:[NSString stringWithFormat:@"[DID-CONNECT] No need to re-intialize the internal text storage in order to avoid loosing existing data..."]];
     }
-    _dictInitialized = TRUE;
+    else {
+        // Preparing our dictionary objects (as we need the device's buttons info)
+        _tileText = [[NSMutableDictionary alloc] initWithCapacity: devWidth*devHeight];
+        NSMutableDictionary * tmpDict = [[NSMutableDictionary alloc] initWithCapacity:1];
+
+        // We need to initialize the dict for text (max the whole size of the device)
+        for (NSInteger row=0; row < devWidth; row++) {
+            for (NSInteger col=0; col < devHeight; col++) {
+                //
+                // We need to fake the usual structure we get while running to use the common keyFromCoord() method
+                // Unfortunately, a dict requires String or string-like elements so we have to do a formatting :(
+                //
+                tmpDict[@"row"] = [NSString stringWithFormat:@"%ld", row];
+                tmpDict[@"column"] = [NSString stringWithFormat:@"%ld", col];
+
+                _tileText[ keyFromCoord(tmpDict) ] = keyFromCoord(tmpDict);
+                // using the key as default value should make any code misbehavior visible
+            }
+        }
+        _dictInitialized = TRUE;
+    }
 }
 
 - (void)deviceDidDisconnect:(NSString *)deviceID
