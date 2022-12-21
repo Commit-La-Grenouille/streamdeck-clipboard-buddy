@@ -47,6 +47,7 @@ Once assigned to a key, you will be able to use this as a slot for keeping somet
 - __to save or replace__: hold the key at least 0.5 sec (but not too long !) and the text preview will appear on the key
 - __to save or replace (sensitive)__: hold the key at least 1 sec and the icon will show a padlock with a timestamp
 - __to use__: press the key to paste it wherever the focus is
+- __to reset__: hold the key at least 3 sec and the icon will go back to the original empty icon
 
 (see the Security sub-section below on the 2 possible ways to save text)
 

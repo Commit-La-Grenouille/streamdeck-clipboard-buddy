@@ -18,8 +18,9 @@
 #import <AppKit/AppKit.h>
 
 
-#define MIN_LONG_PRESS    0.5
+#define MIN_LONG_PRESS  0.5
 #define SECURE_PRESS    1.0
+#define CLEAR_PRESS     3.0
 
 // Size of the images
 #define IMAGE_SIZE    144
@@ -339,7 +340,7 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
     // Logging the length of the key press for future reference
     [_connectionManager logMessage: [NSString stringWithFormat:@"[KEY UP] Key pressed for %20lf sec", diff]];
     
-    if (diff >= MIN_LONG_PRESS ) {
+    if (diff >= MIN_LONG_PRESS) {
         
         // Grabbing the current data in the clipboard
         NSString * clipboardContent = [_pboard stringForType:NSStringPboardType];
@@ -359,14 +360,26 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
         // Showing the copy worked
         [_connectionManager showOKForContext:context];
         
-        if (diff >= SECURE_PRESS) {
+        if (diff >= SECURE_PRESS && diff < CLEAR_PRESS) {
             // Changing the background to convey we have sensitive data there
             [_connectionManager setImage:_base64PostitSecure withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
             
-            // Adding a safe title to avoid leaking sensitive data
+            // TODO: Adding a safe title to avoid leaking sensitive data
             NSString * secureTitle = askUserForLabel(_daFo);
             [_connectionManager logMessage:[NSString stringWithFormat:@"We asked the user and got the label (%@)", secureTitle]];
+
             [_connectionManager setTitle:secureTitle withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+        }
+        else if (diff >= CLEAR_PRESS) {
+            // Purging the struct by resetting to the default value
+            NSString * dictKey = keyFromCoord(payload[@"coordinates"]);
+            _tileText[dictKey] = dictKey;
+            
+            // Changing the background to convey we have purged the data
+            [_connectionManager setImage:_base64PostitSleepy withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+            
+            // And clearing the text if it was a secure entry
+            [_connectionManager setTitle:@"" withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
         }
         else {
             NSString * textToDisplay = _tileText[ keyFromCoord(payload[@"coordinates"]) ];
