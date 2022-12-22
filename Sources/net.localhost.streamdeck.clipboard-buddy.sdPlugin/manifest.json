@@ -21,14 +21,15 @@
   "CodePath": "Clipboard-Buddy",
   "Name": "Clipboard Buddy",
   "Description": "Your best friend with clipboard text retention needs",
+  "URL": "https://github.com/Commit-La-Grenouille/streamdeck-clipboard-buddy",
   "Icon": "postit-store",
-  "Version": "0.1.0",
+  "Version": "0.5.1",
   "Category": "Clipboard Buddy",
   "CategoryIcon": "postit-category",
   "OS": [
     {
       "Platform": "mac",
-      "MinimumVersion": "10.12"
+      "MinimumVersion": "10.13"
     }
   ],
   "Software": {

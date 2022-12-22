@@ -8,6 +8,7 @@
 
 # Binaries we do not want in Git (more in the release section)
 net.localhost.streamdeck.clipboard-buddy.streamDeckPlugin
+net.localhost.streamdeck.clipboard-buddy.v*.streamDeckPlugin
 Sources/net.localhost.streamdeck.clipboard-buddy.sdPlugin/Clipboard-Buddy
 
 # Mac-related noise
