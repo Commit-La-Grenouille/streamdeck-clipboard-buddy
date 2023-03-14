@@ -17,6 +17,8 @@
 #import "ESDUtilities.h"
 #import <AppKit/AppKit.h>
 
+#define STORE_ACT  @"net.localhost.streamdeck.clipboard-buddy"
+#define NUKE_ACT   @"net.localhost.streamdeck.clipboard-buddy-nuke"
 
 #define MIN_LONG_PRESS  0.5
 #define SECURE_PRESS    1.0
@@ -241,6 +243,50 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
 }
 
 
+//
+// Utility function to init/reset the storage dict
+//
+static NSMutableDictionary * ResetDictContent(NSInteger thisDevHeight, NSInteger thisDevWidth) {
+
+    // A basic dict for our row-column to string transformation
+    NSMutableDictionary * tmpDict = [[NSMutableDictionary alloc] initWithCapacity:1];
+    
+    // The final dict with the default values inside
+    NSMutableDictionary * rdyDict = [[NSMutableDictionary alloc] initWithCapacity: thisDevWidth*thisDevHeight];
+
+    // We need to initialize the dict for text (max the whole size of the device)
+    for (NSInteger row=0; row < thisDevWidth; row++) {
+        for (NSInteger col=0; col < thisDevHeight; col++) {
+            //
+            // We need to fake the usual structure we get while running to use the common keyFromCoord() method
+            // Unfortunately, a dict requires String or string-like elements so we have to do a formatting :(
+            //
+            tmpDict[@"row"] = [NSString stringWithFormat:@"%ld", row];
+            tmpDict[@"column"] = [NSString stringWithFormat:@"%ld", col];
+            
+            rdyDict[ keyFromCoord(tmpDict) ] = keyFromCoord(tmpDict);
+            // using the key as default value should make any code misbehavior visible
+        }
+    }
+    return rdyDict;
+}
+
+
+//
+// Utility function to properly clear a key (background + title)
+//
+static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *backgroundImage) {
+    
+    // Changing the background to convey we have purged the data
+    [conMan setImage:backgroundImage withContext:thisContext withTarget:kESDSDKTarget_HardwareAndSoftware];
+    
+    // And clearing the text if it was a secure entry
+    [conMan setTitle:@"" withContext:thisContext withTarget:kESDSDKTarget_HardwareAndSoftware];
+    
+    return true;
+}
+
+
 // MARK: - MyStreamDeckPlugin
 
 @interface MyStreamDeckPlugin ()
@@ -253,6 +299,8 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
 // The text we want to hold (one entry per key)
 @property (strong) NSMutableDictionary *tileText;
 @property BOOL dictInitialized;
+@property (strong) NSMutableDictionary *tileContext;
+// The context of each tile to simplify global actions (like the nuke)
 
 // The global clipboard
 @property NSPasteboard *pboard;
@@ -267,6 +315,10 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
 
 // For secure entries we store objects to reuse
 @property (strong) NSDateFormatter *daFo;
+
+// The information about the device we use to deal properly with the storage dict
+@property NSInteger devHeight;
+@property NSInteger devWidth;
 
 @end
 
@@ -328,7 +380,21 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
 
 - (void)keyDownForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID
 {
-    _keyPressed = [[NSDate alloc]init];
+    // Useful only when dealing with STORE_ACT actions but does not hurt for others
+    _keyPressed = [[NSDate alloc] init];
+    
+    if([action isEqualToString:NUKE_ACT]) {
+        
+        // We check which key holds data and make sure it gets purged properly (visually)
+        for(NSString * key in [_tileContext allKeys]) {
+            ClearKey(_connectionManager, _tileContext[key], _base64PostitSleepy);
+            [_tileContext removeObjectForKey:key];
+        }
+        // At this point, everything should be visually clean and we must ensure the text storage is too ;)
+        _tileText = [NSMutableDictionary dictionaryWithDictionary:ResetDictContent(_devHeight, _devWidth)];
+        
+        [_connectionManager showOKForContext:context];
+    }
 }
 
 
@@ -348,6 +414,7 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
         // Making sure we store the clipboard data into a separate entry specific to our button
         NSString * dictKey = keyFromCoord(payload[@"coordinates"]);
         _tileText[dictKey] = clipboardContent;
+        _tileContext[dictKey] = context;
         
         // Picking also a pseudo-random color for the text we will display on the button
         NSColor *thisColor = _textColorMatrix[ arc4random_uniform(sizeof(_textColorMatrix)) ];
@@ -374,12 +441,9 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
             // Purging the struct by resetting to the default value
             NSString * dictKey = keyFromCoord(payload[@"coordinates"]);
             _tileText[dictKey] = dictKey;
+            [_tileContext removeObjectForKey:dictKey];
             
-            // Changing the background to convey we have purged the data
-            [_connectionManager setImage:_base64PostitSleepy withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
-            
-            // And clearing the text if it was a secure entry
-            [_connectionManager setTitle:@"" withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+            ClearKey(_connectionManager, context, _base64PostitSleepy);
         }
         else {
             NSString * textToDisplay = _tileText[ keyFromCoord(payload[@"coordinates"]) ];
@@ -463,33 +527,20 @@ static NSString * askUserForLabel(NSDateFormatter *df) {
 - (void)deviceDidConnect:(NSString *)deviceID withDeviceInfo:(NSDictionary *)deviceInfo
 {
     // Relaying the dimensions of the current device as integers
-    NSInteger devWidth = [deviceInfo[@"size"][@"rows"] integerValue];
-    NSInteger devHeight= [deviceInfo[@"size"][@"columns"] integerValue];
+    _devHeight= [deviceInfo[@"size"][@"columns"] integerValue];
+    _devWidth = [deviceInfo[@"size"][@"rows"] integerValue];
     
     // Making sure we do not loose data if the computer is locked or goes to sleep ;)
     if( _dictInitialized ) {
         [_connectionManager logMessage:[NSString stringWithFormat:@"[DID-CONNECT] No need to re-intialize the internal text storage in order to avoid loosing existing data..."]];
     }
     else {
-        // Preparing our dictionary objects (as we need the device's buttons info)
-        _tileText = [[NSMutableDictionary alloc] initWithCapacity: devWidth*devHeight];
-        NSMutableDictionary * tmpDict = [[NSMutableDictionary alloc] initWithCapacity:1];
-
-        // We need to initialize the dict for text (max the whole size of the device)
-        for (NSInteger row=0; row < devWidth; row++) {
-            for (NSInteger col=0; col < devHeight; col++) {
-                //
-                // We need to fake the usual structure we get while running to use the common keyFromCoord() method
-                // Unfortunately, a dict requires String or string-like elements so we have to do a formatting :(
-                //
-                tmpDict[@"row"] = [NSString stringWithFormat:@"%ld", row];
-                tmpDict[@"column"] = [NSString stringWithFormat:@"%ld", col];
-
-                _tileText[ keyFromCoord(tmpDict) ] = keyFromCoord(tmpDict);
-                // using the key as default value should make any code misbehavior visible
-            }
-        }
+        // Preparing text dictionary (as we need the device's buttons info)
+        _tileText = [NSMutableDictionary dictionaryWithDictionary:ResetDictContent(_devHeight, _devWidth)];
         _dictInitialized = TRUE;
+
+        // Preparing also the context dictionary (without any content for now)
+        _tileContext = [[NSMutableDictionary alloc] initWithCapacity: _devWidth*_devHeight];
     }
 }
 

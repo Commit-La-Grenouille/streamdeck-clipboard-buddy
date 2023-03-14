@@ -2,17 +2,18 @@
 
 - [Plugin usage with a Stream Deck device](#plugin-usage-with-a-stream-deck-device)
   - [Overview](#overview)
-  - [Step-by-step guides](#step-by-step-guides)
+  - [Step-by-step guide (for the Clipboard action)](#step-by-step-guide-for-the-clipboard-action)
     - [Saving text](#saving-text)
     - [Saving sensitive text](#saving-sensitive-text)
     - [Clearing a key](#clearing-a-key)
+  - [Guide for the Clear All action](#guide-for-the-clear-all-action)
 
 ## Overview
 
 The point of this plugin is to enable you to set aside some **text data** you have in your clipboard for later.
 Once a key holds some text, you can paste it in most text areas by doing a quick press on the key.
 
-## Step-by-step guides
+## Step-by-step guide (for the Clipboard action)
 
 ### Saving text
 
@@ -33,3 +34,8 @@ Once a key holds some text, you can paste it in most text areas by doing a quick
 - First, your key will contain either a regular text ![Regular text](documentation_images/regular-text.png) or secure text ![Secure text](documentation_images/secure-text.png)
 - Do a long press on the key (**3 seconds or longer**)
 - When you release the key it should be back to the empty image ![Empty key](documentation_images/unused.png)
+
+## Guide for the Clear All action
+
+This action is very simple: you activate it, it clears all the Clipboard actions on the Stream Deck (be careful !).
+![Clear All](documentation_images/clear-all.png)

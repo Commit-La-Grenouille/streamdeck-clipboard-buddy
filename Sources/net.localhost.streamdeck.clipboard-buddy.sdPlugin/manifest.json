@@ -14,6 +14,21 @@
       "SupportedInMultiActions": false,
       "Tooltip": "",
       "UUID": "net.localhost.streamdeck.clipboard-buddy"
+    },
+    {
+      "Icon": "postit-action",
+      "Name": "All clear slot",
+      "States": [
+        {
+          "Image": "postit-nuke",
+          "TitleAlignment": "middle",
+          "FontSize": "12",
+          "TitleColor": "cyan"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "",
+      "UUID": "net.localhost.streamdeck.clipboard-buddy-nuke"
     }
   ],
   "SDKVersion": 2,

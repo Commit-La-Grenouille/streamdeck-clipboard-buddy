@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Let's stop at the first error
+set -e
+
 PROJ="Clipboard-Buddy"
 HERE=$(dirname "$0")
 
@@ -15,4 +18,4 @@ xcodebuild -project "${HERE}/../Sources/${PROJ}.xcodeproj" -alltargets -configur
 "${HERE}/_deploy-plugin-dev.sh"
 
 # 4) RE-OPEN STREAM DECK TO LOAD THE LATEST VERSION OF THE PLUGIN
-open "/Applications/Stream Deck.app"
+open "/Applications/Elgato Stream Deck.app"
