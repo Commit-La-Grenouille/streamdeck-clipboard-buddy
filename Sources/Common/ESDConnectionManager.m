@@ -360,6 +360,13 @@
 	 			[self.delegate applicationDidTerminate:payload];
 	 		}
 	 	}
+        else if([event isEqualToString:@kESDSDKEventDidReceiveGlobalSettings])
+        {
+            if([self.delegate respondsToSelector:@selector(didReceiveGlobalSettings:withPayload:)])
+            {
+                [self.delegate didReceiveGlobalSettings:action withPayload:payload];
+            }
+        }
 	}
 	@catch(...)
 	{

@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 -(void)setTitle:(nullable NSString *)inTitle withContext:(id)inContext withTarget:(ESDSDKTarget)inTarget;
--(void)setImage:(nullable NSString*)inBase64ImageString withContext:(id)inContext withTarget:(ESDSDKTarget)inTarget;
+-(void)setImage:(nullable NSString *)inBase64ImageString withContext:(id)inContext withTarget:(ESDSDKTarget)inTarget;
 -(void)showAlertForContext:(id)inContext;
 -(void)showOKForContext:(id)inContext;
 -(void)setSettings:(NSDictionary *)inSettings forContext:(id)inContext;

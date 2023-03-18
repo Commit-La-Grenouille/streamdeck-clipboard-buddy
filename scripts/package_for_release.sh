@@ -20,7 +20,14 @@ PLUGIN="net.localhost.streamdeck.clipboard-buddy"
 EXT="streamDeckPlugin"
 
 
-# Grabbingt the distribution tool if not yet present
+# Making sure we update the manifest.json with the right value
+sed -e "s/\"Version\": \".*\",/\"Version\": \"${VERS}\",/" Sources/${PLUGIN}.sdPlugin/manifest.json > Sources/${PLUGIN}.sdPlugin/manifest.json.new
+rm Sources/${PLUGIN}.sdPlugin/manifest.json
+mv Sources/${PLUGIN}.sdPlugin/manifest.json.new Sources/${PLUGIN}.sdPlugin/manifest.json
+git commit -am "[RELEASE] Bumping manifest.json version to ${VERS}"
+
+
+# Grabbing the distribution tool if not yet present
 
 #https://developer.elgato.com/documentation/stream-deck/sdk/packaging/
 if [[ ! -e "${HERE}/DistributionTool" ]]; then

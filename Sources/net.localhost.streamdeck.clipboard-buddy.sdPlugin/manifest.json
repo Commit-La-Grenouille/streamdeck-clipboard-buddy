@@ -1,11 +1,11 @@
 {
   "Actions": [
     {
-      "Icon": "postit-action",
+      "Icon": "icons/postit-action",
       "Name": "Clipboard slot",
       "States": [
         {
-          "Image": "postit-unused",
+          "Image": "icons/postit-unused",
           "TitleAlignment": "middle",
           "FontSize": "12",
           "TitleColor": "cyan"
@@ -16,11 +16,11 @@
       "UUID": "net.localhost.streamdeck.clipboard-buddy"
     },
     {
-      "Icon": "postit-action",
+      "Icon": "icons/postit-action",
       "Name": "All clear slot",
       "States": [
         {
-          "Image": "postit-nuke",
+          "Image": "icons/postit-nuke",
           "TitleAlignment": "middle",
           "FontSize": "12",
           "TitleColor": "cyan"
@@ -37,10 +37,10 @@
   "Name": "Clipboard Buddy",
   "Description": "Your best friend with clipboard text retention needs",
   "URL": "https://github.com/Commit-La-Grenouille/streamdeck-clipboard-buddy",
-  "Icon": "postit-store",
+  "Icon": "icons/postit-store",
   "Version": "0.5.1",
   "Category": "Clipboard Buddy",
-  "CategoryIcon": "postit-category",
+  "CategoryIcon": "icons/postit-category",
   "OS": [
     {
       "Platform": "mac",

@@ -17,12 +17,14 @@
 #import "ESDUtilities.h"
 #import <AppKit/AppKit.h>
 
+// REMEMBER THAT THIS STORE_ACT IS ALSO IN THE index_pi.js FILE
 #define STORE_ACT  @"net.localhost.streamdeck.clipboard-buddy"
 #define NUKE_ACT   @"net.localhost.streamdeck.clipboard-buddy-nuke"
 
-#define MIN_LONG_PRESS  0.5
-#define SECURE_PRESS    1.0
-#define CLEAR_PRESS     3.0
+// REMEMBER THAT THESE DEFAULT VALUES ARE ALSO IN THE index_pi.js FILE
+#define MIN_LONG_PRESS_DEFAULT  0.5
+#define SECURE_PRESS_DEFAULT    1.0
+#define CLEAR_PRESS_DEFAULT     3.0
 
 // Size of the images
 #define IMAGE_SIZE    144
@@ -320,6 +322,11 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 @property NSInteger devHeight;
 @property NSInteger devWidth;
 
+// The properties to store the configuration for the actions
+@property double MIN_LONG_PRESS;
+@property double SECURE_PRESS;
+@property double CLEAR_PRESS;
+
 @end
 
 
@@ -332,13 +339,13 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 - (void)setupIfNeeded
 {
     if (_base64PostitSleepy == nil) {
-        _base64PostitSleepy = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"postit-unused@2x.png"), @"", nil));
+        _base64PostitSleepy = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"icons/postit-unused@2x.png"), @"", nil));
     }
 	if (_base64PostitEmpty == nil) {
-		_base64PostitEmpty = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"postit-empty@2x.png"), @"", nil));
+		_base64PostitEmpty = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"icons/postit-empty@2x.png"), @"", nil));
 	}
     if (_base64PostitSecure == nil) {
-        _base64PostitSecure = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"postit-secure@2x.png"), @"", nil));
+        _base64PostitSecure = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"icons/postit-secure@2x.png"), @"", nil));
     }
 
     // Preparing the matrix to diversify the color of key's text (almost enough for the 15 buttons)
@@ -371,6 +378,11 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
     // Preparing the date formatter once and for all
     _daFo = [[NSDateFormatter alloc] init];
     [_daFo setDateFormat:@"dd.MM.YY\nHH:mm:ss"];
+
+    // Making sure we have some default values in case the didReceiveGlobalSettings never comes
+    _MIN_LONG_PRESS = MIN_LONG_PRESS_DEFAULT;
+    _SECURE_PRESS = SECURE_PRESS_DEFAULT;
+    _CLEAR_PRESS = CLEAR_PRESS_DEFAULT;
 }
 
 
@@ -407,13 +419,13 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
         return;
     }
 
-    _keyReleased = [[NSDate alloc]init];
+    _keyReleased = [[NSDate alloc] init];
     NSTimeInterval diff = [_keyReleased timeIntervalSinceDate:_keyPressed];
     
     // Logging the length of the key press for future reference
     [_connectionManager logMessage: [NSString stringWithFormat:@"[KEY UP] Key pressed for %20lf sec", diff]];
     
-    if (diff >= MIN_LONG_PRESS) {
+    if (diff >= _MIN_LONG_PRESS) {
         
         // Grabbing the current data in the clipboard
         NSString * clipboardContent = [_pboard stringForType:NSStringPboardType];
@@ -434,7 +446,7 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
         // Showing the copy worked
         [_connectionManager showOKForContext:context];
         
-        if (diff >= SECURE_PRESS && diff < CLEAR_PRESS) {
+        if (diff >= _SECURE_PRESS && diff < _CLEAR_PRESS) {
             // Changing the background to convey we have sensitive data there
             [_connectionManager setImage:_base64PostitSecure withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
             
@@ -444,7 +456,7 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 
             [_connectionManager setTitle:secureTitle withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
         }
-        else if (diff >= CLEAR_PRESS) {
+        else if (diff >= _CLEAR_PRESS) {
             // Purging the struct by resetting to the default value
             NSString * dictKey = keyFromCoord(payload[@"coordinates"]);
             _tileText[dictKey] = dictKey;
@@ -471,7 +483,7 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
                 
                 // Defining everything as image (background + text)
                 NSString *backgroundWithText64 = CreateBase64EncodedString(
-                                                                           ComposeImage(@"postit-empty@2x.png", textToDisplay, thisColor));
+                                                                           ComposeImage(@"icons/postit-empty@2x.png", textToDisplay, thisColor));
                 
                 [_connectionManager setImage:backgroundWithText64 withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
                 
@@ -564,6 +576,26 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 - (void)applicationDidTerminate:(NSDictionary *)applicationInfo
 {
 	// Nothing to do
+}
+
+- (void) didReceiveGlobalSettings: (NSString *)action withPayload:(NSDictionary *)payload
+{
+    // Reloading the config in memory because the user changed it in the ESD UI
+    for (NSString *propKey in payload) {
+
+        if ([propKey isEqualToString:@"simple"]) {
+            _MIN_LONG_PRESS = [[payload objectForKey:propKey] doubleValue];
+        }
+        else if ([propKey isEqualToString:@"secure"]) {
+            _SECURE_PRESS = [[payload objectForKey:propKey] doubleValue];
+        }
+        else if ([propKey isEqualToString:@"clear"]) {
+            _CLEAR_PRESS = [[payload objectForKey:propKey] doubleValue];
+        }
+        else {
+            [_connectionManager logMessage:[NSString stringWithFormat:@"[DID-RECEIVE-GLOBAL] Unknown property (%@) with value (%@)", propKey, payload[propKey]]];
+        }
+    }
 }
 
 @end
