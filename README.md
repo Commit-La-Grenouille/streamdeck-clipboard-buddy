@@ -20,7 +20,7 @@
 
 A Stream Deck plugin for Mac to have some clipboard entries handy (independently from clipboard always changing status).
 
-![Stream Deck screenshot](preview.png)
+![Stream Deck screenshot](Sources/net.localhost.streamdeck.clipboard-buddy.sdPlugin/previews/2-states-relationship.png)
 
 If you are on Windows, check [BarRaider](https://github.com/BarRaider)'s "Multi Clip" function available in his [Win Tools](https://github.com/BarRaider/streamdeck-wintools) plugin.
 

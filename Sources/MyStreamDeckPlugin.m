@@ -380,8 +380,10 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 
 - (void)keyDownForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID
 {
-    // Useful only when dealing with STORE_ACT actions but does not hurt for others
-    _keyPressed = [[NSDate alloc] init];
+    // Useful only when dealing with STORE_ACT actions otherwise it would trigger a pasting on keyUpForAction
+    if([action isEqualToString:STORE_ACT]) {
+        _keyPressed = [[NSDate alloc] init];
+    }
     
     if([action isEqualToString:NUKE_ACT]) {
         
@@ -400,6 +402,11 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 
 - (void)keyUpForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID
 {
+    if([action isEqualToString:NUKE_ACT]) {
+        // We should do nothing
+        return;
+    }
+
     _keyReleased = [[NSDate alloc]init];
     NSTimeInterval diff = [_keyReleased timeIntervalSinceDate:_keyPressed];
     
