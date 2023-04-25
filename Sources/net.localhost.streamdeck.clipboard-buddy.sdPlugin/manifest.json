@@ -2,7 +2,7 @@
   "Actions": [
     {
       "Icon": "icons/postit-action",
-      "Name": "Clipboard slot",
+      "Name": "Clipboard slot (multi)",
       "States": [
         {
           "Image": "icons/postit-unused",
@@ -29,6 +29,21 @@
       "SupportedInMultiActions": false,
       "Tooltip": "",
       "UUID": "net.localhost.streamdeck.clipboard-buddy-nuke"
+    },
+    {
+      "Icon": "icons/postit-action",
+      "Name": "Line clear slot",
+      "States": [
+        {
+          "Image": "icons/postit-trashcan",
+          "TitleAlignment": "middle",
+          "FontSize": "12",
+          "TitleColor": "cyan"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "",
+      "UUID": "net.localhost.streamdeck.clipboard-buddy-line"
     }
   ],
   "SDKVersion": 2,

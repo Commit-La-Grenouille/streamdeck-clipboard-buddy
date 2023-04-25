@@ -19,7 +19,10 @@
 
 // REMEMBER THAT THIS STORE_ACT IS ALSO IN THE index_pi.js FILE
 #define STORE_ACT  @"net.localhost.streamdeck.clipboard-buddy"
+#define CLEAR_ACT  @"net.localhost.streamdeck.clipboard-buddy-clear"
+#define SECUR_ACT  @"net.localhost.streamdeck.clipboard-buddy-secure"
 #define NUKE_ACT   @"net.localhost.streamdeck.clipboard-buddy-nuke"
+#define LINE_ACT   @"net.localhost.streamdeck.clipboard-buddy-line"
 
 // REMEMBER THAT THESE DEFAULT VALUES ARE ALSO IN THE index_pi.js FILE
 #define MIN_LONG_PRESS_DEFAULT  0.5
@@ -409,12 +412,35 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
         
         [_connectionManager showOKForContext:context];
     }
+    
+    if([action isEqualToString:LINE_ACT]) {
+        // Let's make sure we do not suicide ourselves (the trash button should not be part of the clean-up action)
+        NSString * notMe = keyFromCoord(payload[@"coordinates"]);
+        
+        // We must only clear the keys in the same line as this button !
+        // So we need to check the line from the payload[@"coordinates"][@"row"]
+        //     & use the device's width to iterate over the columns ;o) (good news: the struct should be sized like the device !)
+        for(NSString * key in [_tileContext allKeys]) {
+            if([key containsString:[NSString stringWithFormat:@"%@#", payload[@"coordinates"][@"row"]]] && key != notMe) {
+                
+                // Making sure the icon is clean (back to default/empty icon)
+                ClearKey(_connectionManager, _tileContext[key], _base64PostitSleepy);
+                
+                // Ensuring that there is no context on-hold for this particular key
+                [_tileContext removeObjectForKey:key];
+                
+                // Purging any text related to this key
+                _tileText[key] = key;
+            }
+            // else we do not care about the keys and should not touch them...
+        }
+    }
 }
 
 
 - (void)keyUpForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID
 {
-    if([action isEqualToString:NUKE_ACT]) {
+    if([action isEqualToString:NUKE_ACT] || [action isEqualToString:LINE_ACT]) {
         // We should do nothing
         return;
     }
