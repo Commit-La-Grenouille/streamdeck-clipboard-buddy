@@ -17,6 +17,36 @@
     },
     {
       "Icon": "icons/postit-action",
+      "Name": "Clipboard slot (clear-only)",
+      "States": [
+        {
+          "Image": "icons/postit-unused-clear",
+          "TitleAlignment": "middle",
+          "FontSize": "12",
+          "TitleColor": "cyan"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "",
+      "UUID": "net.localhost.streamdeck.clipboard-buddy-clear"
+    },
+    {
+      "Icon": "icons/postit-action",
+      "Name": "Clipboard slot (secure-only)",
+      "States": [
+        {
+          "Image": "icons/postit-unused-secure",
+          "TitleAlignment": "middle",
+          "FontSize": "12",
+          "TitleColor": "cyan"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "",
+      "UUID": "net.localhost.streamdeck.clipboard-buddy-secure"
+    },
+    {
+      "Icon": "icons/postit-action",
       "Name": "All clear slot",
       "States": [
         {

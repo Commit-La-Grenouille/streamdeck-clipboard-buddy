@@ -27,7 +27,7 @@
 // REMEMBER THAT THESE DEFAULT VALUES ARE ALSO IN THE index_pi.js FILE
 #define MIN_LONG_PRESS_DEFAULT  0.5
 #define SECURE_PRESS_DEFAULT    1.0
-#define CLEAR_PRESS_DEFAULT     3.0
+#define CLEAR_PRESS_DEFAULT     2.0
 
 // Size of the images
 #define IMAGE_SIZE    144
@@ -299,12 +299,16 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 // The empty post-it icon encoded in base64
 @property (strong) NSString *base64PostitEmpty;
 @property (strong) NSString *base64PostitSleepy;
+@property (strong) NSString *base64PostitSleepyClearOnly;
+@property (strong) NSString *base64PostitSleepySecureOnly;
 @property (strong) NSString *base64PostitSecure;
 
 // The text we want to hold (one entry per key)
 @property (strong) NSMutableDictionary *tileText;
 @property BOOL dictInitialized;
 @property (strong) NSMutableDictionary *tileContext;
+@property (strong) NSMutableDictionary *tileType;
+@property (strong) NSDictionary *typeBaseImg;
 // The context of each tile to simplify global actions (like the nuke)
 
 // The global clipboard
@@ -344,6 +348,20 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
     if (_base64PostitSleepy == nil) {
         _base64PostitSleepy = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"icons/postit-unused@2x.png"), @"", nil));
     }
+    if (_base64PostitSleepyClearOnly == nil) {
+        _base64PostitSleepyClearOnly = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"icons/postit-unused-clear@2x.png"), @"", nil));
+    }
+    if (_base64PostitSleepySecureOnly == nil) {
+        _base64PostitSleepySecureOnly = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"icons/postit-unused-secure@2x.png"), @"", nil));
+    }
+    
+    // This dict will make the code simpler by selecting the right default background when a button gets cleaned (instead of having another if/else block)
+    _typeBaseImg = @{
+        STORE_ACT : _base64PostitSleepy,
+        CLEAR_ACT : _base64PostitSleepyClearOnly,
+        SECUR_ACT : _base64PostitSleepySecureOnly
+    };
+    
 	if (_base64PostitEmpty == nil) {
 		_base64PostitEmpty = CreateBase64EncodedString(ComposeImage(GetResourcePath(@"icons/postit-empty@2x.png"), @"", nil));
 	}
@@ -396,7 +414,7 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 - (void)keyDownForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID
 {
     // Useful only when dealing with STORE_ACT actions otherwise it would trigger a pasting on keyUpForAction
-    if([action isEqualToString:STORE_ACT]) {
+    if([action isEqualToString:STORE_ACT] || [action isEqualToString:CLEAR_ACT] || [action isEqualToString:SECUR_ACT]) {
         _keyPressed = [[NSDate alloc] init];
     }
     
@@ -404,7 +422,7 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
         
         // We check which key holds data and make sure it gets purged properly (visually)
         for(NSString * key in [_tileContext allKeys]) {
-            ClearKey(_connectionManager, _tileContext[key], _base64PostitSleepy);
+            ClearKey(_connectionManager, _tileContext[key], _typeBaseImg[key]);
             [_tileContext removeObjectForKey:key];
         }
         // At this point, everything should be visually clean and we must ensure the text storage is too ;)
@@ -424,7 +442,7 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
             if([key containsString:[NSString stringWithFormat:@"%@#", payload[@"coordinates"][@"row"]]] && key != notMe) {
                 
                 // Making sure the icon is clean (back to default/empty icon)
-                ClearKey(_connectionManager, _tileContext[key], _base64PostitSleepy);
+                ClearKey(_connectionManager, _tileContext[key], _typeBaseImg[key]);
                 
                 // Ensuring that there is no context on-hold for this particular key
                 [_tileContext removeObjectForKey:key];
@@ -451,6 +469,10 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
     // Logging the length of the key press for future reference
     [_connectionManager logMessage: [NSString stringWithFormat:@"[KEY UP] Key pressed for %20lf sec", diff]];
     
+    /*
+     * ALL THE STORAGE CASES
+     */
+    
     if (diff >= _MIN_LONG_PRESS) {
         
         // Grabbing the current data in the clipboard
@@ -472,7 +494,13 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
         // Showing the copy worked
         [_connectionManager showOKForContext:context];
         
-        if (diff >= _SECURE_PRESS && diff < _CLEAR_PRESS) {
+        /*
+         * CASE 2: we have a long press or we are using a secure-only button
+         */
+        if (
+               ([action isEqualToString:STORE_ACT] && diff >= _SECURE_PRESS && diff < _CLEAR_PRESS)
+            || ([action isEqualToString:SECUR_ACT] && diff < _SECURE_PRESS)
+            ) {
             // Changing the background to convey we have sensitive data there
             [_connectionManager setImage:_base64PostitSecure withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
             
@@ -482,15 +510,31 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 
             [_connectionManager setTitle:secureTitle withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
         }
-        else if (diff >= _CLEAR_PRESS) {
+        /*
+         * CASE 3: the long press has been long enough to trigger a clearing
+         */
+        
+        // We are making sure that on single-type actions, the clear duration is shorter (no need to wait forever)
+        else if (
+                    ( [action isEqualToString:STORE_ACT] && diff >= _CLEAR_PRESS)
+                 || (([action isEqualToString:CLEAR_ACT] || [action isEqualToString:SECUR_ACT]) && diff >= _SECURE_PRESS)
+                 ) {
             // Purging the struct by resetting to the default value
-            NSString * dictKey = keyFromCoord(payload[@"coordinates"]);
             _tileText[dictKey] = dictKey;
             [_tileContext removeObjectForKey:dictKey];
             
-            ClearKey(_connectionManager, context, _base64PostitSleepy);
+            ClearKey(_connectionManager, context, _typeBaseImg[dictKey]);
         }
+        /*
+         * CASE 1: the press is short enough or the button is made for clear storage
+         */
         else {
+            // SAFETY: hopefully we will never reach within this conditional block but just in case we avoid storing in clear on a secure-only action
+            if([action isEqualToString:SECUR_ACT]) {
+                [_connectionManager logMessage:[NSString stringWithFormat:@"WARNING ! A secure action at coordinates (%@) reached the clear storage with a press duration of (%f)", dictKey, diff]];
+                return;
+            }
+
             NSString * textToDisplay = _tileText[ keyFromCoord(payload[@"coordinates"]) ];
             
             if (textToDisplay.length <= LINE_LENGTH) {
@@ -523,10 +567,15 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
             }
         }
     }
+    /*
+     * CASE 0: the press is short and we must paste what we have in storage
+     */
     else {
         [_pboard clearContents];
         BOOL wasClipboardUpdated = [_pboard setString:_tileText[ keyFromCoord(payload[@"coordinates"]) ] forType:NSStringPboardType];
-        [_connectionManager logMessage:[NSString stringWithFormat:@"[KEY UP][SHORT PRESS] Text (%@) reinjected back into the clipboard: %hd", _tileText[ keyFromCoord(payload[@"coordinates"]) ], wasClipboardUpdated]];
+        
+        // This logging message is less crucial and should not leak sensitive data (so staying generic)
+        [_connectionManager logMessage:[NSString stringWithFormat:@"[KEY UP][SHORT PRESS] Text was reinjected back into the clipboard: %hd", wasClipboardUpdated]];
 
         if (wasClipboardUpdated) {
             //
@@ -586,6 +635,9 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 
         // Preparing also the context dictionary (without any content for now)
         _tileContext = [[NSMutableDictionary alloc] initWithCapacity: _devWidth*_devHeight];
+        
+        // Preparing also the button types registry
+        _tileType = [[NSMutableDictionary alloc] initWithCapacity: _devWidth*_devHeight];
     }
 }
 
@@ -606,6 +658,8 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 
 - (void) didReceiveGlobalSettings: (NSString *)action withPayload:(NSDictionary *)payload
 {
+    // WORK IN PROGRESS (NOT OPERATIONAL QUITE YET)
+    
     // Reloading the config in memory because the user changed it in the ESD UI
     for (NSString *propKey in payload) {
 
