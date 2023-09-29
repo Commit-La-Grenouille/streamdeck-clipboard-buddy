@@ -484,6 +484,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				INSTALL_PATH = "net.localhost.streamdeck.clipboard-buddy.sdPlugin";
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.localhost.streamdeck.clipboard-buddy";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -497,6 +498,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				INSTALL_PATH = "net.localhost.streamdeck.clipboard-buddy.sdPlugin";
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.localhost.streamdeck.clipboard-buddy";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

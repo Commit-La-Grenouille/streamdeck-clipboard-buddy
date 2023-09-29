@@ -292,6 +292,7 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 }
 
 
+
 // MARK: - MyStreamDeckPlugin
 
 @interface MyStreamDeckPlugin ()
@@ -333,6 +334,9 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
 @property double MIN_LONG_PRESS;
 @property double SECURE_PRESS;
 @property double CLEAR_PRESS;
+
+// Shortcut for the keyboard mapping variance
+@property NSDictionary *keyCodeMapping;
 
 @end
 
@@ -392,6 +396,15 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
             NSColor.systemYellowColor,
         ]; // note: alpha sorted on the color name ;)
     }
+    
+    // In order to keep the code compact (and the memory usage small), here is the dict of keyCodes for some layouts
+    _keyCodeMapping = @{  // NSNumber plays better with NSDictionaries than CGKeyCode that is an unsigned int
+        @"turkish": @(8),  // code for V in Turkish F
+        @"default": @(9),  // code for V in qwerty/azerty/qwertz
+        @"dvorigh": @(43), // code for V in Dvorak right-handed
+        @"dvorak" : @(47)  // code for V in Dvorak (us/fr/...)
+    };
+    // Any exotic keyboard layout just need to be defined here with the 2 keycodes to be supported by the plugin
 
     // Defining we want to use the central clipboard
     _pboard = [NSPasteboard generalPasteboard];
@@ -581,7 +594,11 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
             //
             // This code is a big programmatic command+V
             //
-            CGKeyCode key = ((CGKeyCode)9); // code for V in qwerty/azerty/qwertz
+            NSTextInputContext *context = [[NSTextInputContext alloc] initWithClient:self];
+            id inputSource = [context selectedKeyboardInputSource];
+            NSString* ident = [inputSource valueForKey:@"identifier"];
+            
+            CGKeyCode key = [_keyCodeMapping[ident] unsignedIntValue];
             
             CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
 
