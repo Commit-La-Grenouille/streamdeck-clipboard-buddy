@@ -581,7 +581,7 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
             //
             // This code is a big programmatic command+V
             //
-            CGKeyCode key = ((CGKeyCode)9); // code for V in qwerty/azerty/qwertz
+            CGKeyCode key = ((CGKeyCode)47); // code for V in Dvorak (us/fr/...)
             
             CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
 
