@@ -583,6 +583,17 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
             //
             CGKeyCode key = ((CGKeyCode)9); // code for V in qwerty/azerty/qwertz
             
+            /*
+            // In order to keep the code compact (and the memory usage small), here is the dict of keyCodes for some layouts
+            _keyCodeMapping = @{  // NSNumber plays better with NSDictionaries than CGKeyCode that is an unsigned int
+                  @"turkish": @(8),  // code for V in Turkish F
+                  @"default": @(9),  // code for V in qwerty/azerty/qwertz
+                  @"dvorigh": @(43), // code for V in Dvorak right-handed
+                  @"dvorak" : @(47)  // code for V in Dvorak (us/fr/...)
+            };
+            // Any exotic keyboard layout just need to be defined here with the 2 keycodes to be supported by the plugin
+            */
+
             CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
 
             CGEventRef keyDown = CGEventCreateKeyboardEvent(source, key, TRUE);
