@@ -428,7 +428,8 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
         // At this point, everything should be visually clean and we must ensure the text storage is too ;)
         _tileText = [NSMutableDictionary dictionaryWithDictionary:ResetDictContent(_devHeight, _devWidth)];
         
-        [_connectionManager showOKForContext:context];
+        // ESD 6.4.0 is showing the status for so long it hinders the plugin usage flow
+        //[_connectionManager showOKForContext:context];
     }
     
     if([action isEqualToString:LINE_ACT]) {
@@ -492,7 +493,8 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
         
 
         // Showing the copy worked
-        [_connectionManager showOKForContext:context];
+        //[_connectionManager showOKForContext:context];
+        // ESD 6.4.0 is showing the status for so long it hinders the plugin usage flow
         
         /*
          * CASE 2: we have a long press or we are using a secure-only button
