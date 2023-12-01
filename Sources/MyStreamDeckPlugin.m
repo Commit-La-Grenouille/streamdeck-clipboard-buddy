@@ -310,7 +310,7 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
     if (diff >= _MIN_LONG_PRESS) {
         
         // Grabbing the current data in the clipboard
-        NSString * clipboardContent = [_pboard stringForType:NSStringPboardType];
+        NSString * clipboardContent = [_pboard stringForType:NSPasteboardTypeString];
 
         // Making sure we store the clipboard data into a separate entry specific to our button
         NSString * dictKey = keyFromCoord(payload[@"coordinates"]);
@@ -407,7 +407,7 @@ static BOOL ClearKey(ESDConnectionManager *conMan, id thisContext, NSString *bac
      */
     else {
         [_pboard clearContents];
-        BOOL wasClipboardUpdated = [_pboard setString:_tileText[ keyFromCoord(payload[@"coordinates"]) ] forType:NSStringPboardType];
+        BOOL wasClipboardUpdated = [_pboard setString:_tileText[ keyFromCoord(payload[@"coordinates"]) ] forType:NSPasteboardTypeString];
         
         // This logging message is less crucial and should not leak sensitive data (so staying generic)
         [_connectionManager logMessage:[NSString stringWithFormat:@"[KEY UP][SHORT PRESS] Text was reinjected back into the clipboard: %hd", wasClipboardUpdated]];
