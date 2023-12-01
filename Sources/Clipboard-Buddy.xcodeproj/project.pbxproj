@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		867231FD2B174E390005365A /* ImageAndTextUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 867231FC2B174E390005365A /* ImageAndTextUtils.m */; };
 		FA29E473215E7D2300C9F60C /* ESDConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FA29E46E215E7D2300C9F60C /* ESDConnectionManager.m */; };
 		FA29E474215E7D2300C9F60C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FA29E46F215E7D2300C9F60C /* main.m */; };
 		FA80591421623A0D00ED7E12 /* ESDUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = FA80591321623A0D00ED7E12 /* ESDUtilities.m */; };
@@ -47,6 +48,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		867231FB2B174E390005365A /* ImageAndTextUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageAndTextUtils.h; sourceTree = "<group>"; };
+		867231FC2B174E390005365A /* ImageAndTextUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageAndTextUtils.m; sourceTree = "<group>"; };
 		FA0F7B772105CBC30028CF34 /* Clipboard-Buddy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Clipboard-Buddy"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA29E46E215E7D2300C9F60C /* ESDConnectionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ESDConnectionManager.m; sourceTree = "<group>"; };
 		FA29E46F215E7D2300C9F60C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -119,6 +122,8 @@
 		FA0F7B6E2105CBC30028CF34 = {
 			isa = PBXGroup;
 			children = (
+				867231FB2B174E390005365A /* ImageAndTextUtils.h */,
+				867231FC2B174E390005365A /* ImageAndTextUtils.m */,
 				FACCC866211AC281008C87BD /* MyStreamDeckPlugin.h */,
 				FACCC865211AC281008C87BD /* MyStreamDeckPlugin.m */,
 				FA29E46D215E7D2300C9F60C /* Common */,
@@ -348,6 +353,7 @@
 				FAC7C8192122CE1D000262E7 /* SRIOConsumerPool.m in Sources */,
 				FA80591421623A0D00ED7E12 /* ESDUtilities.m in Sources */,
 				FAC7C8292122CE1D000262E7 /* SRWebSocket.m in Sources */,
+				867231FD2B174E390005365A /* ImageAndTextUtils.m in Sources */,
 				FAC7C8232122CE1D000262E7 /* SRRandom.m in Sources */,
 				FAC7C81D2122CE1D000262E7 /* SRConstants.m in Sources */,
 				FAC7C81A2122CE1D000262E7 /* SRProxyConnect.m in Sources */,
@@ -497,6 +503,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				INSTALL_PATH = "net.localhost.streamdeck.clipboard-buddy.sdPlugin";
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.localhost.streamdeck.clipboard-buddy";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
